@@ -33,7 +33,7 @@ export const MODELS = {
   // Image generation — expects a Stable Diffusion WebUI (AUTOMATIC1111) API.
   // Start SD with: --api flag. Swap url for ComfyUI or another backend.
   image: {
-    url: "http://192.168.1.110:7860/sdapi/v1/txt2img",
+    url: `${process.env.SD_BASE}/sdapi/v1/txt2img`,
     backend: "stable-diffusion",
     defaultParams: {
       steps: 30,
