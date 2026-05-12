@@ -4,6 +4,7 @@ import { route } from './router.js';
 import { handleChat } from './handlers/chat.js';
 import { handleCode } from './handlers/code.js';
 import { handleImage } from './handlers/image.js';
+import { handleArr } from './handlers/arr.js';
 import { sendChunked, sendImage } from './utils/discordUtils.js';
 import { getHistory, appendHistory, clearHistory } from './utils/memory.js';
 
@@ -21,6 +22,7 @@ const HANDLERS = {
   chat:  handleChat,
   code:  handleCode,
   image: handleImage,
+  arr:   handleArr,
 };
 
 const HELP_TEXT = [
@@ -30,6 +32,7 @@ const HELP_TEXT = [
   "`!chat <message>`  — General conversation (Nemotron)",
   "`!code <message>`  — Code generation & debugging",
   "`!image <prompt>`  — Image generation (Stable Diffusion)",
+  "`!arr [subcommand]`— Arr suite: status · queue · calendar · wanted · disk",
   "`!reset`           — Clear your conversation history",
   "`!help`            — Show this message",
 ].join("\n");
@@ -78,11 +81,15 @@ client.on('messageCreate', async (message) => {
   }
 
   if (result.type === "text") {
-    appendHistory(message.author.id, "user", prompt);
-    appendHistory(message.author.id, "assistant", result.content);
+    if (type !== "arr") {
+      appendHistory(message.author.id, "user", prompt);
+      appendHistory(message.author.id, "assistant", result.content);
+    }
     await sendChunked(message, result.content);
   } else if (result.type === "image") {
     await sendImage(message, result.content, result.filename);
+  } else if (result.type === "embed") {
+    await message.reply({ embeds: [result.embed] });
   }
 });
 

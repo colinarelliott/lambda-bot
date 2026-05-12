@@ -46,6 +46,40 @@ export const MODELS = {
 
 };
 
+// ─── Arr Suite Configuration ─────────────────────────────────────────────────
+// Add API keys and ports to .env. Apps with no API key are skipped at runtime.
+export const ARR = {
+  sonarr: {
+    name: "Sonarr",
+    url: `http://${process.env.ARR_HOST}:${process.env.SONARR_PORT || 8989}`,
+    apiKey: process.env.SONARR_API_KEY,
+    apiBase: "/api/v3",
+  },
+  radarr: {
+    name: "Radarr",
+    url: `http://${process.env.ARR_HOST}:${process.env.RADARR_PORT || 7878}`,
+    apiKey: process.env.RADARR_API_KEY,
+    apiBase: "/api/v3",
+  },
+  lidarr: {
+    name: "Lidarr",
+    url: `http://${process.env.ARR_HOST}:${process.env.LIDARR_PORT || 8686}`,
+    apiKey: process.env.LIDARR_API_KEY,
+    apiBase: "/api/v3",
+  },
+  prowlarr: {
+    name: "Prowlarr",
+    url: `http://${process.env.ARR_HOST}:${process.env.PROWLARR_PORT || 9696}`,
+    apiKey: process.env.PROWLARR_API_KEY,
+    apiBase: "/api/v1",
+  },
+  sabnzbd: {
+    name: "SABnzbd",
+    url: `http://${process.env.ARR_HOST}:${process.env.SABNZBD_PORT || 8080}`,
+    apiKey: process.env.SABNZBD_API_KEY,
+  },
+};
+
 // ─── Explicit Command Prefixes ────────────────────────────────────────────────
 // Messages starting with these are routed directly, bypassing LLM classification.
 export const PREFIXES = {
@@ -53,6 +87,7 @@ export const PREFIXES = {
   "!code":  "code",
   "!image": "image",
   "!img":   "image",
+  "!arr":   "arr",
   "!help":  "help",
   "!reset": "reset",
 };
