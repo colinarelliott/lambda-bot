@@ -48,34 +48,36 @@ export const MODELS = {
 
 // ─── Arr Suite Configuration ─────────────────────────────────────────────────
 // Add API keys and ports to .env. Apps with no API key are skipped at runtime.
+const arrUrl = (prefix) => `https://${prefix}.${process.env.ARR_DOMAIN}`;
+
 export const ARR = {
   sonarr: {
     name: "Sonarr",
-    url: `http://${process.env.ARR_HOST}:${process.env.SONARR_PORT || 8989}`,
+    url: arrUrl("sonarr"),
     apiKey: process.env.SONARR_API_KEY,
     apiBase: "/api/v3",
   },
   radarr: {
     name: "Radarr",
-    url: `http://${process.env.ARR_HOST}:${process.env.RADARR_PORT || 7878}`,
+    url: arrUrl("radarr"),
     apiKey: process.env.RADARR_API_KEY,
     apiBase: "/api/v3",
   },
   lidarr: {
     name: "Lidarr",
-    url: `http://${process.env.ARR_HOST}:${process.env.LIDARR_PORT || 8686}`,
+    url: arrUrl("lidarr"),
     apiKey: process.env.LIDARR_API_KEY,
     apiBase: "/api/v3",
   },
   prowlarr: {
     name: "Prowlarr",
-    url: `http://${process.env.ARR_HOST}:${process.env.PROWLARR_PORT || 9696}`,
+    url: arrUrl("prowlarr"),
     apiKey: process.env.PROWLARR_API_KEY,
     apiBase: "/api/v1",
   },
   sabnzbd: {
     name: "SABnzbd",
-    url: `http://${process.env.ARR_HOST}:${process.env.SABNZBD_PORT || 8080}`,
+    url: arrUrl("sabnzbd"),
     apiKey: process.env.SABNZBD_API_KEY,
   },
 };
