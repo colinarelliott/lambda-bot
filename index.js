@@ -61,6 +61,15 @@ client.on('messageCreate', async (message) => {
 
   await message.channel.sendTyping();
 
+  const ACK_REACTIONS = {
+    code:  '👨‍💻',
+    image: '👍',
+    arr:   '📡',
+  };
+  if (ACK_REACTIONS[type]) {
+    try { await message.react(ACK_REACTIONS[type]); } catch { /* no-op if missing permissions */ }
+  }
+
   const history = getHistory(message.author.id);
 
   let result;
