@@ -2,6 +2,7 @@ import { EmbedBuilder } from 'discord.js';
 import { ARR } from '../config.js';
 import {
   configuredApps,
+  getHealth,
   getAllHealth,
   getQueue,
   getCalendar,
@@ -162,6 +163,66 @@ async function handleDisk() {
 
 // ─── Main export ─────────────────────────────────────────────────────────────
 
+async function handleAppStats(appName) {
+  const cfg = ARR[appName];
+  if (!cfg) return handleHelp();
+
+  const embed = new EmbedBuilder()
+    .setTitle(`${cfg.name} — Stats`)
+    .setColor(0x5865f2)
+    .setTimestamp();
+
+  // Health
+  try {
+    const { ok, issues, unreachable } = await getHealth(appName);
+    const statusLine = unreachable
+      ? '🔴 Unreachable'
+      : ok
+      ? '🟢 OK'
+      : `🟡 ${issues.map(i => i.message).join('; ')}`;
+    embed.addFields({ name: 'Status', value: statusLine, inline: false });
+  } catch (err) {
+    embed.addFields({ name: 'Status', value: `_Error: ${err.message}_`, inline: false });
+  }
+
+  // Queue
+  try {
+    const items = await getQueue(appName);
+    if (!items.length) {
+      embed.addFields({ name: 'Queue', value: '_Empty_', inline: false });
+    } else {
+      const value = items.map(i => {
+        const pct = i.progress != null ? `${i.progress.toFixed(0)}%` : '?%';
+        const eta = i.eta ? ` · ETA ${i.eta}` : '';
+        return `**${i.title.slice(0, 55)}**\n${i.status} · ${pct}${eta}`;
+      }).join('\n\n').slice(0, 1024);
+      embed.addFields({ name: 'Queue', value, inline: false });
+    }
+  } catch (err) {
+    embed.addFields({ name: 'Queue', value: `_Unavailable: ${err.message}_`, inline: false });
+  }
+
+  // Disk
+  if (appName !== 'prowlarr') {
+    try {
+      const disks = await getDiskSpace(appName);
+      if (!disks.length) {
+        embed.addFields({ name: 'Disk', value: '_No data_', inline: false });
+      } else {
+        const value = disks.map(d => {
+          const pct = d.total > 0 ? `${((d.free / d.total) * 100).toFixed(0)}%` : '?%';
+          return `\`${d.path}\`\n${fmtBytes(d.free)} free of ${fmtBytes(d.total)} (${pct} free)`;
+        }).join('\n').slice(0, 1024);
+        embed.addFields({ name: 'Disk', value, inline: false });
+      }
+    } catch (err) {
+      embed.addFields({ name: 'Disk', value: `_Unavailable: ${err.message}_`, inline: false });
+    }
+  }
+
+  return { type: 'embed', embed };
+}
+
 function handleHelp() {
   const embed = new EmbedBuilder()
     .setTitle('Arr Suite — Help')
@@ -193,6 +254,8 @@ export async function handleArr(prompt) {
     case 'wanted':   return handleWanted();
     case 'disk':     return handleDisk();
     case 'help':     return handleHelp();
-    default:         return handleHelp();
+    default:
+      if (subcommand in ARR) return handleAppStats(subcommand);
+      return handleHelp();
   }
 }

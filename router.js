@@ -10,6 +10,7 @@ const ROUTER_SYSTEM =
   "  chat   — general conversation, Q&A, summaries, writing\n" +
   "  code   — programming, debugging, code review, scripts, shell commands\n" +
   "  image  — image generation, art, visual descriptions meant to be drawn\n" +
+  "  arr    — queries about Sonarr/Radarr/Lidarr/Prowlarr/SABnzbd status, queues, etc.\n" +
   "Respond with only the label word.";
 
 /**
@@ -30,7 +31,14 @@ export async function route(content) {
     }
   }
 
-  // 2. Auto-classify with the router model.
+  // 2. Arr app keyword — if the message names a specific arr app, route directly.
+  const ARR_APPS = ['sonarr', 'radarr', 'lidarr', 'prowlarr', 'sabnzbd'];
+  const mentionedApp = ARR_APPS.find(app => lower.includes(app));
+  if (mentionedApp) {
+    return { type: 'arr', prompt: mentionedApp };
+  }
+
+  // 3. Auto-classify with the router model.
   let type = "chat";
   try {
     const label = await ollamaChat({
