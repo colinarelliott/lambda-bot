@@ -162,14 +162,22 @@ async function handleDisk() {
 
 // ─── Main export ─────────────────────────────────────────────────────────────
 
-const ARR_HELP = [
-  '**Arr Suite Commands**',
-  '`!arr` / `!arr status`  — Health check all apps',
-  '`!arr queue`            — Active download queue',
-  '`!arr calendar`         — Upcoming releases (next 7 days)',
-  '`!arr wanted`           — Missing / wanted items',
-  '`!arr disk`             — Disk space per root folder',
-].join('\n');
+function handleHelp() {
+  const embed = new EmbedBuilder()
+    .setTitle('Arr Suite — Help')
+    .setColor(0x5865f2)
+    .setDescription('All available `!arr` commands:')
+    .addFields(
+      { name: '`!arr` / `!arr status`', value: 'Health check all configured apps', inline: false },
+      { name: '`!arr queue`',           value: 'Show the active download queue across all apps', inline: false },
+      { name: '`!arr calendar`',        value: 'Upcoming releases in the next 7 days (Sonarr / Radarr / Lidarr)', inline: false },
+      { name: '`!arr wanted`',          value: 'Missing / wanted monitored items (Sonarr / Radarr / Lidarr)', inline: false },
+      { name: '`!arr disk`',            value: 'Disk space per root folder for all apps', inline: false },
+      { name: '`!arr help`',            value: 'Show this help message', inline: false },
+    )
+    .setTimestamp();
+  return { type: 'embed', embed };
+}
 
 /**
  * Handle an !arr command.
@@ -179,11 +187,12 @@ export async function handleArr(prompt) {
   const subcommand = prompt.trim().toLowerCase().split(/\s+/)[0] || 'status';
 
   switch (subcommand) {
-    case 'status':  return handleStatus();
-    case 'queue':   return handleQueue();
-    case 'calendar':return handleCalendar();
-    case 'wanted':  return handleWanted();
-    case 'disk':    return handleDisk();
-    default:        return { type: 'text', content: ARR_HELP };
+    case 'status':   return handleStatus();
+    case 'queue':    return handleQueue();
+    case 'calendar': return handleCalendar();
+    case 'wanted':   return handleWanted();
+    case 'disk':     return handleDisk();
+    case 'help':     return handleHelp();
+    default:         return handleHelp();
   }
 }
